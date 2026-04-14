@@ -1,0 +1,19 @@
+# Arduino build artifacts
+build/
+app/bin/
+*.elf
+*.hex
+*.eep
+*.lst
+*.map
+*.sym
+*.lss
+*.o
+*.d
+
+# Local environment and IDE settings
+.idea/
+.vscode/
+.DS_Store
+*.swp
+*~
