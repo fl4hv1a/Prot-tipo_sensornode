@@ -1,0 +1,12 @@
+{
+	"folders": [
+		{
+			"path": ".."
+		},
+		{
+			"name": "SensorNode_Prototype",
+			"path": "../../../Documentos/PlatformIO/Projects/SensorNode_Prototype"
+		}
+	],
+	"settings": {}
+}
