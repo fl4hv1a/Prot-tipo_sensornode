@@ -23,3 +23,5 @@ app/bin/
 .DS_Store
 *.swp
 *~
+
+simulator/
