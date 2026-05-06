@@ -5,6 +5,8 @@
 #include <SD.h>
 #include <SPI.h>
 #include <RTClib.h>
+#include <Adafruit_GFX.h>
+#include <Adafruit_SSD1306.h>
 
 #define INTERVALO_KEEPAWAKE 5000U	// 5s
 #define INTERVALO_DADOS 15000U	// 15s
@@ -36,6 +38,14 @@ const int IDS_ATIVOS[NUM_SENSORES] = {
 
 // RTC externo (com base em um DS3231)
 RTC_DS3231 rtc;
+
+// Dimensões do display
+#define SCREEN_WIDTH 128
+#define SCREEN_HEIGHT 64
+#define OLED_RESET -1   // pino reset não utilizado
+
+// Display
+Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 
 struct SensorData {
     int id_sensor;
@@ -107,6 +117,21 @@ uint32_t getExtTime();
  */
 uint32_t getTime();
 
+/**
+ * @brief Limpa o display.
+ */
+void clearDisplay();
+
+/**
+ * @brief Imprime uma string qualquer no display.
+ */
+void displayPrint(String string, int cursorX, int cursorY, int tamanho);
+
+/**
+ * @brief Inicializa a comunicação com o display.
+ */
+void setupDisplay();
+
 void TaskKeepAwake(void *pvParameters) {
 	for(;;) {
 		keepAwake();
@@ -146,6 +171,7 @@ void setup() {
     setupRTC();
     setupSD();
     setupMux();
+    setupDisplay();
 
 	xTaskCreate(TaskKeepAwake, "KeepAwake", 2048, NULL, 2, NULL); // Prioridade 2 (Maior)
     xTaskCreate(TaskDados, "Dados", 4096, NULL, 1, NULL);         // Prioridade 1 (Menor)
@@ -199,7 +225,7 @@ int writeData(const SensorData *leituras) {
     char filename[16]; 
     
     // Formata o nome do arquivo corretamente: "/YYYYMMDD.csv\0"
-    sprintf(filename, "/%04d%02d%02d.csv",
+    snprintf(filename, sizeof(filename), "/%04d%02d%02d.csv",
         timeinfo->tm_year + 1900,   // tm_year conta anos desde 1900
         timeinfo->tm_mon + 1,       // tm_mon começa do 0
         timeinfo->tm_mday
@@ -239,7 +265,20 @@ int writeData(const SensorData *leituras) {
 }
 
 void showData(const SensorData *leituras) {
-	;
+	int soma = 0;
+    float media;
+
+    for (int i = 0; i < NUM_SENSORES; i++) {
+        soma += leituras[i].leituraBruta;
+    }
+
+    media = (float) soma / (float) NUM_SENSORES;
+    
+    char text[10];
+
+    snprintf(text, sizeof(text), "%.0f", media);
+
+    displayPrint(text, 0, 0, 10);
 }
 
 void setupMux() {
@@ -310,4 +349,26 @@ uint32_t getExtTime() {
 uint32_t getTime() {
     time_t timestamp = time(NULL);
     return (uint32_t) timestamp;
+}
+
+void setupDisplay() {
+    if(!display.begin(SSD1306_SWITCHCAPVCC)) {
+        Serial.println("ERRO: Falha ao inicializar o OLED!");
+    }
+
+    display.clearDisplay();
+    display.setTextColor(SSD1306_WHITE);
+    display.display();
+}
+
+void clearDisplay() {
+    display.clearDisplay();
+    display.display();
+}
+
+void displayPrint(String string, int cursorX, int cursorY, int tamanho) {
+    display.setTextSize(tamanho);
+    display.setCursor(cursorX, cursorY);
+    display.print(texto);
+    display.display();
 }
