@@ -278,7 +278,8 @@ void showData(const SensorData *leituras) {
 
     snprintf(text, sizeof(text), "%.0f", media);
 
-    displayPrint(text, 0, 0, 10);
+    clearDisplay();
+    displayPrint(text, 0, 0, 2);
 }
 
 void setupMux() {
@@ -369,6 +370,6 @@ void clearDisplay() {
 void displayPrint(String string, int cursorX, int cursorY, int tamanho) {
     display.setTextSize(tamanho);
     display.setCursor(cursorX, cursorY);
-    display.print(texto);
+    display.print(string);
     display.display();
 }
