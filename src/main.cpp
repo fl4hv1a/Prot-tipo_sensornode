@@ -43,6 +43,7 @@ RTC_DS3231 rtc;
 #define SCREEN_WIDTH 128
 #define SCREEN_HEIGHT 64
 #define OLED_RESET -1   // pino reset não utilizado
+#define DISPLAY_ADDRESS 0x3C
 
 // Display
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
@@ -353,7 +354,7 @@ uint32_t getTime() {
 }
 
 void setupDisplay() {
-    if(!display.begin(SSD1306_SWITCHCAPVCC)) {
+    if(!display.begin(SSD1306_SWITCHCAPVCC, DISPLAY_ADDRESS)) {
         Serial.println("ERRO: Falha ao inicializar o OLED!");
     }
 
