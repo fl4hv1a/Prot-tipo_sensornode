@@ -23,5 +23,6 @@ app/bin/
 .DS_Store
 *.swp
 *~
+*.code-workspace
 
 simulator/
